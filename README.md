@@ -1,195 +1,175 @@
 # New_Business_Dashboard2
 ---
 title: "README: Retail Dashboard Shiny App"
-output:
-  github_document:
-    toc: true
-    toc_depth: 2
-date: "`r Sys.Date()`"
----
+Retail Dashboard Shiny App
+Overview
+This project is an interactive Shiny dashboard for visualizing retail sales data from online_retail.xlsx. It features vibrant visualizations, including value boxes with coral-like, emerald-like, and sapphire-like gradients, geospatial scatter plots, sales bar charts, monthly sales trends, and a country coordinates table. The app includes reactive widgets for filtering by country, date range, sales threshold, and customizing plot themes and colors. Geospatial processing adds country coordinates to the data, and performance optimizations (caching, debouncing, sampling) ensure fast rendering.
+Features
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-```
+Value Boxes: Display unique customers, total sales, and average order value with red (coral-like), green (emerald-like), and blue (sapphire-like) gradients.
+Plots:
+Scatter Plot: Customer locations on a longitude-latitude map, colored by country or quantity (sampled to 1000 points for performance).
+Bar Plot: Total sales by country with customizable colors and optional white borders.
+Line Plot: Monthly sales trends with a blue-to-coral gradient.
 
-# Retail Dashboard Shiny App
 
-This Shiny application provides an interactive dashboard for analyzing online retail data. It visualizes sales trends, customer locations, and key metrics like total sales and average order value. The app uses geospatial data to map customer countries and includes filtering by country.
+Interactive Widgets:
+Filter by multiple countries, date range, and minimum sales.
+Customize plot themes (theme_minimal, theme_dark, etc.), color palettes (Custom, Set1, Paired), scatter point size, and bar borders.
+Toggle plot visibility and table columns/rows.
 
-## Features
-- **Interactive Filters**: Select countries to filter data.
-- **Visualizations**: Scatter plots (customer locations), bar plots (sales by country), and line plots (sales over time).
-- **Metrics**: Displays unique customers, total sales, and average order value.
-- **Data Table**: Shows country coordinates for selected countries using the `DT` package.
 
-## Installation
+Country Table: Displays coordinates for selected countries with server-side rendering.
+Performance:
+Cached data (retail_data_merged.rds, sales_by_country.rds, etc.) for faster loading.
+Debounced filtering (500ms) to reduce reactive overhead.
+Sampled scatter plot and pre-aggregated data for plots.
 
-### Prerequisites
-- **R**: Version 4.0 or higher recommended.
-- **RStudio**: Optional, for easier R Markdown knitting and Shiny app development.
-- **Git**: Required for version control and pushing to GitHub. Install from [git-scm.com](https://git-scm.com/).
-- **Data File**: `online_retail.xlsx` (place in your working directory or update the file path).
 
-### Install R Packages
-Install required packages using the following command:
 
-```R
-install.packages(c("shiny", "shinydashboard", "bslib", "dplyr", "ggplot2", "lubridate", "sf", "rnaturalearth", "tidyr", "readxl", "DT", "knitr", "rmarkdown"))
-```
+Prerequisites
 
-### Data Setup
-Ensure the `online_retail.xlsx` file is available. Update the file path in the data loading script if necessary:
+R: Version 4.0 or higher (download from CRAN).
+RStudio: Recommended for running Shiny apps (download from RStudio).
+Dependencies: Install required R packages:install.packages(c("DT", "shinydashboard", "RColorBrewer", "bslib", "shiny", "dplyr", "ggplot2", "lubridate", "sf", "rnaturalearth"))
 
-```R
-file_path <- "online_retail.xlsx"  # Adjust as needed
-```
 
-## Usage
+Data: Ensure the following files are in your working directory:
+retail_data_merged.rds: Merged retail data with coordinates.
+country_data.rds: Country coordinates.
+sales_by_country.rds: Pre-aggregated sales by country.
+monthly_sales.rds: Pre-aggregated monthly sales.
+If these are missing, regenerate them using geospatial.R and online_retail.xlsx.
 
-1. **Clone the Repository** (if hosted on GitHub):
-   ```bash
-   git clone https://github.com/your-username/retail-dashboard.git
-   ```
-   Replace `your-username` and `retail-dashboard` with your GitHub username and repository name.
 
-2. **Open the Shiny App Script**:
-   - Open the main script (e.g., `app.R`) in RStudio or your preferred R environment.
 
-3. **Run the App**:
-   ```R
-   library(shiny)
-   shiny::runApp("app.R")  # Adjust to your script name
-   ```
+Setup
 
-4. **Interact with the Dashboard**:
-   - Use the sidebar to filter by country or adjust plot settings.
-   - View metrics, plots, and the country coordinates table.
+Clone the Repository:git clone <repository-url>
+cd <repository-folder>
 
-## Example Output
 
-Below is a sample bar plot showing total sales by country, generated from the app:
+Install Dependencies:Run the following in R or RStudio:install.packages(c("DT", "shinydashboard", "RColorBrewer", "bslib", "shiny", "dplyr", "ggplot2", "lubridate", "sf", "rnaturalearth"))
 
-```{r example-plot, echo=TRUE, fig.width=8, fig.height=5}
-library(dplyr)
-library(ggplot2)
 
-# Simulate retail_data (replace with actual data)
-set.seed(123)
-retail_data <- data.frame(
-  Country = sample(c("United Kingdom", "United States", "Germany", "France"), 100, replace = TRUE),
-  TotalPrice = runif(100, 10, 1000)
-)
+Prepare Data:
+If you have retail_data_merged.rds, country_data.rds, sales_by_country.rds, and monthly_sales.rds, place them in the working directory.
+If not, ensure online_retail.xlsx is available and run the geospatial processing script:source("geospatial.R")
 
-# Bar plot
-retail_data %>%
-  group_by(Country) %>%
-  summarise(TotalSales = sum(TotalPrice)) %>%
-  ggplot(aes(x = reorder(Country, -TotalSales), y = TotalSales, fill = Country)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Total Sales by Country", x = "Country", y = "Total Sales")
-```
+This generates the required .rds files.
 
-## Pushing to GitHub
 
-To share this project on GitHub, follow these steps:
 
-1. **Create a GitHub Repository**:
-   - Go to [github.com/new](https://github.com/new) and create a repository (e.g., `retail-dashboard`).
-   - Do not initialize with a README, as you’re providing your own.
-   - Note the repository URL: `https://github.com/your-username/retail-dashboard.git`.
+Usage
 
-2. **Initialize a Git Repository Locally** (if not already done):
-   ```bash
-   cd /path/to/your/project
-   git init
-   ```
+Run the Shiny App:
+Open app.R in RStudio and click "Run App", or run:source("app.R")
 
-3. **Create a `.gitignore` File** (recommended):
-   - Exclude sensitive or unnecessary files (e.g., data file, R session files):
-     ```bash
-     echo "*.RData\n*.Rhistory\nonline_retail.xlsx" > .gitignore
-     ```
 
-4. **Add Project Files**:
-   - Stage all files (e.g., `app.R`, `README.md`, `README.Rmd`, `.gitignore`):
-     ```bash
-     git add .
-     ```
-   - Or add specific files:
-     ```bash
-     git add app.R README.md README.Rmd .gitignore
-     ```
+The app will open in a browser or RStudio viewer.
 
-5. **Commit Changes**:
-   ```bash
-   git commit -m "Initial commit of Retail Dashboard project"
-   ```
 
-6. **Link to GitHub Repository**:
-   ```bash
-   git remote add origin https://github.com/your-username/retail-dashboard.git
-   ```
-   Verify with:
-   ```bash
-   git remote -v
-   ```
+Interact with the Dashboard:
+Data Filters:
+Select countries (e.g., united kingdom, france) or "All".
+Adjust the date range (e.g., 2010-12-01 to 2011-12-31).
+Set a minimum sales threshold via the slider.
 
-7. **Push to GitHub**:
-   ```bash
-   git push -u origin main
-   ```
-   If the default branch is `master`:
-   ```bash
-   git push -u origin master
-   ```
 
-8. **Authenticate**:
-   - Use your GitHub username and a personal access token (PAT) if prompted. Generate a PAT in GitHub under Settings > Developer Settings > Personal Access Tokens > Tokens (classic), selecting scopes like `repo`.
+Plot Customization:
+Choose a color variable (Country, Quantity).
+Select a plot theme (Minimal, Dark, etc.).
+Pick a color palette (Custom, Set1, Paired).
+Toggle bar borders and adjust scatter point size.
 
-9. **Verify**:
-   - Visit your repository (e.g., `https://github.com/your-username/retail-dashboard`) to confirm files are uploaded and `README.md` is rendered.
 
-### Using RStudio
-- **Enable Git**: File > New Project > Existing Directory, select your project folder, and enable Git.
-- **Stage Files**: In the Git pane, check boxes for files to stage.
-- **Commit**: Click “Commit”, enter a message, and commit.
-- **Push**: Click “Push” after setting the remote (`git remote add origin ...`).
+Display Options:
+Show/hide scatter, bar, or line plots.
+Set table rows (5–50) and select columns (Country, Longitude, Latitude).
 
-## Troubleshooting
 
-- **Missing DT Package**:
-  ```R
-  install.packages("DT")
-  ```
-- **File Not Found**: Ensure `online_retail.xlsx` is in the correct directory or update the `file_path` variable.
-- **Git Authentication**: If `git push` fails, use a PAT or set up SSH keys.
-- **Rendering Errors**: Check that all dependencies are installed and R is up-to-date.
-- **Table Issues**: If the country table fails to render, verify that `country_data` contains valid `Longitude` and `Latitude` values.
 
-## Generating This README
 
-This README was generated from an R Markdown file (`README.Rmd`). To regenerate or modify it:
+View Outputs:
+Value Boxes: Unique customers (red/coral), total sales (green/emerald), average order value (blue/sapphire).
+Plots: Geospatial scatter, country sales bar, monthly sales line.
+Table: Country coordinates with sapphire header and alternating row colors.
 
-1. Open `README.Rmd` in RStudio.
-2. Click the "Knit" button or run:
-   ```R
-   library(rmarkdown)
-   rmarkdown::render("README.Rmd", output_format = "github_document")
-   ```
-3. The output will be `README.md`, suitable for GitHub.
 
-## Contributing
 
-Contributions are welcome! To contribute:
-- Fork the repository.
-- Create a new branch for your changes.
-- Submit a pull request with a description of your updates.
+File Structure
+retail-dashboard/
+├── app.R                    # Shiny app script
+├── geospatial.R             # Geospatial processing script
+├── online_retail.xlsx       # Input data (required if regenerating .rds files)
+├── retail_data_merged.rds   # Cached retail data with coordinates
+├── country_data.rds         # Cached country coordinates
+├── sales_by_country.rds     # Cached sales by country
+├── monthly_sales.rds        # Cached monthly sales
+├── README.md                # This file
 
-## License
+Troubleshooting
 
+Error: "Invalid color: coral/emerald/sapphire":
+Ensure app.R uses color = "red", color = "green", color = "blue" in valueBox calls, styled via CSS.
+Check the CSS in app.R for .bg-red, .bg-green, .bg-blue classes.
+
+
+Error: Palette has fewer colors than values:
+The app now uses 38 colors to handle all countries. If errors persist, check unique(retail_data$Country) and share output.
+
+
+Slow Performance:
+Verify that .rds files are used (faster than processing online_retail.xlsx).
+Check nrow(retail_data); if large (>100,000 rows), consider further sampling in app.R.
+
+
+Missing Cache Files:
+Run geospatial.R with online_retail.xlsx in the working directory to generate .rds files.
+
+
+Table Not Rendering:
+Check console for Unique countries and Country table before rendering logs.
+Share any warnings (e.g., missing coordinates).
+
+
+General Issues:
+Share console output, str(retail_data), and browser details (e.g., Chrome, Firefox).
+Ensure all packages are installed and up-to-date.
+
+
+
+Contributing
+Contributions are welcome! Please:
+
+Fork the repository.
+Create a branch (git checkout -b feature/your-feature).
+Commit changes (git commit -m "Add your feature").
+Push to the branch (git push origin feature/your-feature).
+Open a pull request.
+
+License
 This project is licensed under the MIT License.
+MIT License
 
----
-Generated with R Markdown and `knitr` on `r Sys.Date()`.
+Copyright (c) 2025 [Sun Ajiboye, sun.ajiboye@outlook.com]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
